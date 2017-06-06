@@ -16,6 +16,8 @@ from sklearn.utils.validation import check_is_fitted
 from ..externals.name_estimators import _name_estimators
 from ..externals import six
 import numpy as np
+from scipy import sparse
+from scipy.sparse import *
 
 
 class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
@@ -119,7 +121,8 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         if not self.use_features_in_secondary:
             self.meta_clf_.fit(meta_features, y)
         else:
-            self.meta_clf_.fit(np.hstack((X, meta_features)), y)
+            #self.meta_clf_.fit(np.hstack((X, meta_features)), y)
+            self.meta_clf_.fit(sparse.hstack((X, csr_matrix(meta_features))),y)
 
         return self
 
@@ -172,7 +175,8 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         if not self.use_features_in_secondary:
             return self.meta_clf_.predict(meta_features)
         else:
-            return self.meta_clf_.predict(np.hstack((X, meta_features)))
+            #return self.meta_clf_.predict(np.hstack((X, meta_features)))
+            return self.meta_clf_.predict(sparse.hstack((X, csr_matrix(meta_features))))
 
     def predict_proba(self, X):
         """ Predict class probabilities for X.
@@ -196,4 +200,5 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         if not self.use_features_in_secondary:
             return self.meta_clf_.predict_proba(meta_features)
         else:
-            return self.meta_clf_.predict_proba(np.hstack((X, meta_features)))
+            #return self.meta_clf_.predict_proba(np.hstack((X, meta_features)))
+            return self.meta_clf_.predict_proba(sparse.hstack((X, csr_matrix(meta_features))))
